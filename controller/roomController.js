@@ -1,23 +1,69 @@
 const query = require('../db/connect');
 
 
-exports.createRoom = async (req, res) => {
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs/promises');
+
+// Set up Multer for file uploads
+// Set up Multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../images'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({
+    storage
+});
+
+exports.uploadImages = (req, res, next) => {
+    upload.array('images', 10)(req, res, (error) => {
+        if (error) {
+            // Handle the error
+            console.error(error);
+            // You can choose to return an error response or call `next(error)` to pass the error to the next middleware
+        }
+        next(); // Call next() to proceed to the next middleware
+    });
+};
+
+exports.createRoom =  async (req, res) => {
     try {
         const { title, location, price, floor, complex, amount, square,
             kitchen_square, conditions, coordinates, people_num, bed_num,
             description } = req.body;
 
-        const insertQuery = `INSERT INTO rooms 
-            (title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-        const dataToInsert = [title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description];
+        let image = null;
+        if (Array.isArray(req.files)) {
+            image = req.files.map(file => file.originalname);
+            image = image.join(',');
+        } else
+            image = "Not specified";
+
+
+        console.log(image);
+        const insertQuery = `INSERT INTO rooms 
+            (title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description,small_images) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
+
+        const dataToInsert = [title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description,image];
 
         // Assuming you have a 'query' function that executes SQL queries
         const result = await query(insertQuery, dataToInsert);
 
+
         // Check if the insertion was successful
         if (result.affectedRows > 0) {
+            // Store the path to the folder in a variable
+            const roomId = result.insertId.toString(); // Assuming the inserted ID is used as the room ID
+            
+            console.log(roomId);
+
             res.status(200).json({ message: 'Room created successfully' });
         } else {
             res.status(500).json({ error: 'Failed to create room' });

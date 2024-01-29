@@ -5,7 +5,7 @@ const roomController = require('../controller/roomController')
 const router = express.Router();
 
 router.route('/').get(roomController.getRooms).
-post(roomController.createRoom);
+post(roomController.uploadImages,roomController.createRoom);
 
 
 router.route('/:id').get(roomController.getRoom).
