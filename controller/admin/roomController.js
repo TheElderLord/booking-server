@@ -172,20 +172,21 @@ exports.getRooms = async (req, res) => {
 
 exports.getRoom = async (req, res) => {
   const id = req.params.id;
-  const sql = `WITH RankedBookHistory AS (
-  SELECT
-    bookHistory.*,
-    ROW_NUMBER() OVER (PARTITION BY bookHistory.roomId ORDER BY bookHistory.id DESC) AS row_num
-  FROM
-    bookHistory
-)
-SELECT
-  rooms.*,
-  COALESCE(rbh.status, 1) AS status
-FROM
-  rooms
-LEFT JOIN
-  RankedBookHistory rbh ON rooms.id = rbh.roomId AND rbh.row_num = 1 where  rooms.id = ${id}`;
+  //   const sql = `WITH RankedBookHistory AS (
+  //   SELECT
+  //     bookHistory.*,
+  //     ROW_NUMBER() OVER (PARTITION BY bookHistory.roomId ORDER BY bookHistory.id DESC) AS row_num
+  //   FROM
+  //     bookHistory
+  // )
+  // SELECT
+  //   rooms.*,
+  //   COALESCE(rbh.status, 1) AS status
+  // FROM
+  //   rooms
+  // LEFT JOIN
+  //   RankedBookHistory rbh ON rooms.id = rbh.roomId AND rbh.row_num = 1 where  rooms.id = ${id}`;
+  const sql = `Select * from rooms where id = ${id}`;
   try {
     const results = await query(sql);
     res.status(200).json({
@@ -199,46 +200,56 @@ LEFT JOIN
     });
   }
 };
-exports.getBookHistory = async (req, res) => {
-  const id = req.params.id;
-  const sql = `SELECT * from bookHistory where roomId = ${id} `;
-  try {
-    const results = await query(sql);
-    res.status(200).json({
-      message: "Success",
-      items: results,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Bad request",
-    });
-  }
-};
+
 exports.bookRoom = async (req, res) => {
   const id = req.params.id;
-  const { fullname, iin, start, end } = req.body;
-  const checkBook = `Select * from bookHistory where status = 0 and roomId = ${id}`;
+  const { firstname, lastname, iin, start, end } = req.body;
 
-  const sql = `Insert into bookHistory(fullname,iin,startDate,endDate,roomId) values(?,?,?,?,?)`;
+  // Query to check if the room is already booked for the specified date range
+  const checkBook = `
+    SELECT * 
+    FROM bookHistory 
+    WHERE status = 0 
+      AND roomId = ${id} 
+      AND startDate <= ? 
+      AND endDate >= ?
+  `;
+
+  // SQL query to insert the booking if the room is available
+  const sql = `
+    INSERT INTO bookHistory (firstname, lastname, iin, startDate, endDate, roomId,created_at) 
+    VALUES (?, ?, ?, ?, ?, ?,?)
+  `;
+
   try {
-    const ch = await query(checkBook);
-    // console.log(ch.length === 0)
+    // Check if the room is available for the specified date range
+    const ch = await query(checkBook, [end, start]);
+
     if (ch.length === 0) {
-      const results = await query(sql, [fullname, iin, start, end, id]);
+      // Room is available, proceed with booking
+      const results = await query(sql, [
+        firstname,
+        lastname,
+        iin,
+        start,
+        end,
+        id,
+        new Date().toLocaleString("ru-RU"),
+      ]);
       res.status(200).json({
         message: "Success",
         items: results,
       });
     } else {
+      // Room is already booked for the specified date range
       res.status(400).json({
-        message: "The room is already booked",
+        message: "The room is already booked for the specified date range",
       });
     }
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: "Bad request",
+      message: "Internal server error",
     });
   }
 };
@@ -273,5 +284,89 @@ exports.deleteRoom = async (req, res) => {
     res.status(500).json({
       message: "Bad request",
     });
+  }
+};
+
+exports.getBookHistoryById = async (req, res) => {
+  const id = req.params.id;
+  const sql = `SELECT * from bookHistory where roomId = ${id} `;
+  try {
+    const results = await query(sql);
+    res.status(200).json({
+      message: "Success",
+      items: results,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Bad request",
+    });
+  }
+};
+exports.getBookHistory = async (req, res) => {
+  const paid = req.query.paid;
+  let sql;
+  if (paid) {
+    if (paid === "true") {
+      sql = `SELECT h.*,r.title FROM bookhistory h
+      left join rooms r
+      on h.roomId = r.id where h.isPaid = 1 ORDER BY h.id DESC;`;
+    } else
+      sql = `SELECT h.*,r.title FROM bookhistory h
+      left join rooms r
+      on h.roomId = r.id where h.isPaid = 0 ORDER BY h.id DESC;`;
+  } else
+    sql = `SELECT h.*, r.title 
+    FROM bookhistory h
+    LEFT JOIN rooms r ON h.roomId = r.id
+    ORDER BY h.id DESC;
+    `;
+  try {
+    const results = await query(sql);
+    res.status(200).json({
+      message: "Success",
+      items: results,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Bad request",
+    });
+  }
+};
+
+exports.deleteHistory = async (req, res) => {
+  const id = req.params.id;
+  const sql = `Delete from bookHistory where id = ?`;
+  try {
+    const result = await query(sql, id);
+    res.status(200).json({
+      message: "Room is deleted",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Bad request",
+    });
+  }
+};
+
+exports.setPaid = async (req, res) => {
+  // console.log("dasdasd")
+  const id = req.params.id;
+  const { isPaid } = req.body;
+  const sql = `Update bookHistory set isPaid = ${isPaid} where id = ${id}`;
+  // console.log(sql);
+  try {
+    const results = await query(sql);
+    res.status(200).json({
+      message: "Success",
+      items: results,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Bad request",
+    });
+    console.log(err);
   }
 };
