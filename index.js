@@ -2,11 +2,13 @@ const express = require('express');
 const cors = require('cors');
 
 const { appPort } = require('./constants');
-const roomRoutes = require('./routes/admin/roomRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const requestRoutes = require('./routes/admin/requestsRouter');
-const userRoutes = require('./routes/userRoutes');
-const roomListRoutes = require('./routes/roomListRoutes');
+
+const adminRoomRoutes = require('./routes/admin/roomRoutes');
+const adminRequestRoutes = require('./routes/admin/requestsRouter');
+const adminUserRoutes = require('./routes/admin/userRoutes');
+
+const userRoutes = require("./routes/user/userRoomRoutes");
+
 
 const app = express();
 
@@ -14,11 +16,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/v1/admin/rooms', adminRoomRoutes);
 
-app.use('/api/v1/requests', requestRoutes);
-app.use('/api/v1/users',userRoutes)
-app.use('/api/v1/roomList',roomListRoutes)
+app.use('/api/v1/admin/requests', adminRequestRoutes);
+app.use('/api/v1/admin/users',adminUserRoutes);
+
+app.use('/api/v1/rooms',userRoutes);
+
+
 
 app.use('/images', express.static('images'));
 

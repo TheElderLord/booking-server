@@ -152,22 +152,7 @@ exports.createRoom = async (req, res) => {
 
 exports.getRooms = async (req, res) => {
   // Modify the SQL query to include the filter conditions
-  let sql = `
-        WITH RankedBookHistory AS (
-          SELECT
-            bookHistory.*,
-            ROW_NUMBER() OVER (PARTITION BY bookHistory.roomId ORDER BY bookHistory.id DESC) AS row_num
-          FROM
-            bookHistory
-        )
-        SELECT
-          rooms.*,
-          COALESCE(rbh.status, 1) AS status
-        FROM
-          rooms
-        LEFT JOIN
-          RankedBookHistory rbh ON rooms.id = rbh.roomId AND rbh.row_num = 1
-    `;
+  let sql = `Select * from rooms`;
 
   // console.log(sql);
 

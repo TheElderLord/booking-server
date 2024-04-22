@@ -4,11 +4,13 @@ const roomController = require('../../controller/user/roomController')
 
 const router = express.Router();
 
-router.route('/').get(roomController.getRooms)
+router.route('/list/').get(roomController.getRooms)
 
 
-router.route('/:id').get(roomController.getRoomById);
+router.route('/list/:id').get(roomController.getRoomById);
 
 router.route('/request').post(roomController.createRequest);
+router.route('/history/:id').get(roomController.getBookHistory);
+
 
 module.exports = router;

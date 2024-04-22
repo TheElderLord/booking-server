@@ -1,9 +1,9 @@
-const query = require("../db/connect");
+const query = require("../../db/connect");
 
 exports.getRooms = async (req, res) => {
   const { amount, squareMin, squareMax, bookdate, priceMin, priceMax, free } =
     req.query;
-  console.log(req.query);
+  // console.log(req.query);
 
   // Modify the SQL query to include the filter conditions
   let sql = `Select * from rooms`;
@@ -69,7 +69,7 @@ exports.getRoomById = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    console.error("Error executing SQL query:", error);
+    console.error("Error executing SQL query:", err);
     res.status(500).json({
       message: "Internal Server Error",
     });
@@ -95,6 +95,23 @@ exports.createRequest = async (req, res) => {
             message: "Bad request",
         })
     }
+};
+
+exports.getBookHistory = async (req, res) => {
+  const id = req.params.id;
+  const sql = `SELECT * from bookHistory where roomId = ${id} `;
+  try {
+    const results = await query(sql);
+    res.status(200).json({
+      message: "Success",
+      items: results,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Bad request",
+    });
+  }
 };
 
 
