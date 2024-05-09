@@ -1,19 +1,4 @@
-const mysql = require('mysql2');
-
-const { dbHost, dbUser, dbPass, dbName, dbPort } = require('../constants')
-
-
-// Create a connection pool
-const pool = mysql.createPool({
-  host: dbHost,
-  user: dbUser,
-  password: dbPass,
-  database: dbName,
-  port:dbPort,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+const pool = require("../config/dbConfig")
 
 pool.getConnection((err, connection) => {
   if (err) {

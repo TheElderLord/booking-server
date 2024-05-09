@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
-const { appPort } = require('./constants');
+const { appPort } = require('./constant/constants');
 
 const adminRoomRoutes = require('./routes/admin/roomRoutes');
 const adminRequestRoutes = require('./routes/admin/requestsRouter');

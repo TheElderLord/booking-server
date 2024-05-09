@@ -5,7 +5,7 @@ const ExcelJS = require('exceljs');
 
 //TRASH
 exports.getList = async (req, res) => {
-    const { isPaid } = req.query;
+    const { isPaid,completed } = req.query;
     // console.log(isPaid);
     let sql = `SELECT roomList.id, users.id as user_id, users.name, users.surname,rooms.id as room_id, rooms.title, roomList.status,roomList.isPaid,roomList.created_at
     FROM roomList
@@ -18,6 +18,13 @@ exports.getList = async (req, res) => {
             INNER JOIN users ON roomList.user_id = users.id
             INNER JOIN rooms ON roomList.room_id = rooms.id where roomList.isPaid = 1`;
         }
+        if(completed === "false"){
+            sql = `SELECT roomList.id, users.id as user_id, users.name, users.surname,rooms.id as room_id, rooms.title, roomList.status,roomList.isPaid,roomList.created_at
+            FROM roomList
+            INNER JOIN users ON roomList.user_id = users.id
+            INNER JOIN rooms ON roomList.room_id = rooms.id where roomList.isPaid = 1`;
+        }
+        
         const results = await query(sql);
         res.status(200).json({
             message: "Success",
