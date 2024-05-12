@@ -8,6 +8,7 @@ router.route('/').get(userController.getUsers)
 .post(userController.createUser);
 
 router.route('/:id').put(userController.updateUser).
-delete(userController.deleteUser);
+delete(userController.deleteUser)
+.patch(userController.toBlackList);
 
 module.exports = router;

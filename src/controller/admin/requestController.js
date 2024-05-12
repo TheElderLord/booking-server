@@ -2,6 +2,7 @@ const query = require('../../db/connect');
 
 exports.getRequests = async (req, res) => {
     try {
+        // const sqlBlackList = `Select * from users where ` 
         let sql = "SELECT * FROM requests";
         if (req.query.hide) {
             sql = "SELECT * FROM requests WHERE status = 0";

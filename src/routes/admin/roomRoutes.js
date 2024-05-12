@@ -13,7 +13,6 @@ delete(roomController.deleteRoom);
 
 
 
-router.route('/book/:id').post(roomController.bookRoom);
 // put(roomController.setFree);
 
 
@@ -22,6 +21,7 @@ router.route('/book/:id').post(roomController.bookRoom);
 router.route('/bookHistory').get(roomController.getBookHistory);
 
 router.route('/bookHistory/:id').get(roomController.getBookHistoryById)
+.post(roomController.bookRoom)
 .delete(roomController.deleteHistory)
 .put(roomController.setPaid)
 .patch(roomController.setGiven);
