@@ -9,7 +9,8 @@ post(roomController.uploadImages,roomController.createRoom);
 
 
 router.route('/list/:id').get(roomController.getRoom).
-delete(roomController.deleteRoom);
+delete(roomController.deleteRoom)
+.put(roomController.updateRoom);
 
 
 

@@ -4,7 +4,7 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../images"));
+    cb(null, path.join(__dirname, "../../../images"));
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -28,21 +28,21 @@ exports.uploadImages = (req, res, next) => {
 
 exports.createRoom = async (req, res) => {
   try {
-    const { title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description } = req.body;
+    const { title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description,short_name } = req.body;
     const images = req.files ? req.files.map((file) => file.originalname).join(",") : "Not specified";
 
     const insertQuery = `
       INSERT INTO rooms 
-      (title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description, small_images) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description, small_images,short_name) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
     `;
 
-    const dataToInsert = [title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description, images];
+    const dataToInsert = [title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description, images,short_name];
     const result = await query(insertQuery, dataToInsert);
 
     if (result.affectedRows > 0) {
       const roomId = result.insertId.toString();
-      res.status(200).json({ message: "Room created successfully", roomId });
+      res.status(204).json({ message: "Room created successfully", roomId });
     } else {
       res.status(500).json({ error: "Failed to create room" });
     }
@@ -51,6 +51,34 @@ exports.createRoom = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+exports.updateRoom = async (req, res) => {
+  try {
+    const roomId = req.params.id; // Extract room id from request params
+    const { title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description, short_name } = req.body;
+    const images = req.files ? req.files.map((file) => file.originalname).join(",") : "Not specified";
+
+    const updateQuery = `
+      UPDATE rooms 
+      SET title = ?, location = ?, price = ?, floor = ?, complex = ?, amount = ?, square = ?, kitchen_square = ?, conditions = ?, coordinates = ?, people_num = ?, bed_num = ?, description = ?, small_images = ?, short_name = ?
+      WHERE id = ?
+    `;
+
+    
+
+    const dataToUpdate = [title, location, price, floor, complex, amount, square, kitchen_square, conditions, coordinates, people_num, bed_num, description, images, short_name, roomId];
+    const result = await query(updateQuery, dataToUpdate);
+    console.log(result);
+    if (result.affectedRows > 0) {
+      res.status(204).json({ message: "Room updated successfully" });
+    } else {
+      res.status(404).json({ error: "Room not found" });
+    }
+  } catch (error) {
+    console.error("Error updating room:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 
 exports.getRooms = async (req, res) => {
   try {
@@ -103,6 +131,9 @@ exports.deleteRoom = async (req, res) => {
   }
 };
 
+
+// Book history
+
 exports.getBookHistoryById = async (req, res) => {
   const id = req.params.id;
   const sql = "SELECT * FROM bookHistory WHERE roomId = ?";
@@ -135,6 +166,8 @@ exports.getBookHistory = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
 
 exports.deleteHistory = async (req, res) => {
   const id = req.params.id;
