@@ -32,7 +32,12 @@ app.use('/images', express.static('images'));
 
 // Handle SPA
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  // Exclude API routes from serving index.html
+  if (req.originalUrl.startsWith('/api')) {
+    res.sendStatus(404); // Not Found for API routes
+  } else {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  }
 });
 
 
