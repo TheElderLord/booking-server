@@ -92,7 +92,13 @@ exports.createRequest = async (req, res) => {
 
 exports.getBookHistory = async (req, res) => {
   const id = req.params.id;
-  const sql = `SELECT * FROM bookhistory WHERE roomId = ? AND STR_TO_DATE(endDate, '%d.%m.%Y') > STR_TO_DATE('13.05.2024', '%d.%m.%Y')`;
+  
+  // Get today's date in the format 'dd.mm.yyyy'
+  const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').reverse().join('.');
+  
+  // Construct the SQL query with the dynamic date
+  const sql = `SELECT * FROM bookhistory WHERE roomId = ? AND STR_TO_DATE(endDate, '%d.%m.%Y') > STR_TO_DATE('${today}', '%d.%m.%Y')`;
+  
   try {
     const results = await query(sql, [id]);
     res.status(200).json({
@@ -106,3 +112,4 @@ exports.getBookHistory = async (req, res) => {
     });
   }
 };
+
