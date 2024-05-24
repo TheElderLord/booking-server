@@ -92,7 +92,7 @@ exports.createRequest = async (req, res) => {
 
 exports.getBookHistory = async (req, res) => {
   const id = req.params.id;
-  const sql = `SELECT * FROM bookHistory WHERE roomId = ? AND STR_TO_DATE(endDate, '%d.%m.%Y') > STR_TO_DATE('27.04.2024', '%d.%m.%Y')`;
+  const sql = `SELECT * FROM bookHistory WHERE roomId = ? AND STR_TO_DATE(endDate, '%d.%m.%Y') > STR_TO_DATE('13.05.2024', '%d.%m.%Y')`;
   try {
     const results = await query(sql, [id]);
     res.status(200).json({
