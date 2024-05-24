@@ -23,6 +23,13 @@ app.use('/api/v1/admin/users',adminUserRoutes);
 
 app.use('/api/v1/rooms',userRoutes);
 
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Handle SPA
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
 
 
 app.use('/images', express.static('images'));
