@@ -107,7 +107,7 @@ exports.bookRoom = async (req, res) => {
   const { id } = req.params;
   const { firstname, lastname, start, end } = req.body;
   const sql = `
-    INSERT INTO bookHistory (firstname, lastname, startDate, endDate, roomId, created_at) 
+    INSERT INTO bookhistory (firstname, lastname, startDate, endDate, roomId, created_at) 
     VALUES (?, ?, ?, ?, ?, ?)
   `;
   try {
@@ -136,7 +136,7 @@ exports.deleteRoom = async (req, res) => {
 
 exports.getBookHistoryById = async (req, res) => {
   const id = req.params.id;
-  const sql = "SELECT * FROM bookHistory WHERE roomId = ?";
+  const sql = "SELECT * FROM bookhistory WHERE roomId = ?";
   try {
     const results = await query(sql, [id]);
     res.status(200).json({ message: "Success", items: results });
@@ -171,7 +171,7 @@ exports.getBookHistory = async (req, res) => {
 
 exports.deleteHistory = async (req, res) => {
   const id = req.params.id;
-  const sql = "DELETE FROM bookHistory WHERE id = ?";
+  const sql = "DELETE FROM bookhistory WHERE id = ?";
   try {
     const result = await query(sql, [id]);
     res.status(200).json({ message: "Booking history deleted successfully" });
@@ -184,7 +184,7 @@ exports.deleteHistory = async (req, res) => {
 exports.setPaid = async (req, res) => {
   const id = req.params.id;
   const { isPaid } = req.body;
-  const sql = "UPDATE bookHistory SET isPaid = ? WHERE id = ?";
+  const sql = "UPDATE bookhistory SET isPaid = ? WHERE id = ?";
   try {
     await query(sql, [isPaid, id]);
     res.status(200).json({ message: "Payment status updated successfully" });
@@ -197,7 +197,7 @@ exports.setPaid = async (req, res) => {
 exports.setGiven = async (req, res) => {
   const id = req.params.id;
   const { amount } = req.body;
-  const sql = "UPDATE bookHistory SET given = ? WHERE id = ?";
+  const sql = "UPDATE bookhistory SET given = ? WHERE id = ?";
   try {
     await query(sql, [amount, id]);
     res.status(200).json({ message: "Given amount updated successfully" });

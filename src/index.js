@@ -24,16 +24,17 @@ app.use('/api/v1/admin/users',adminUserRoutes);
 
 app.use('/api/v1/rooms',userRoutes);
 
-app.use(express.static(path.join(__dirname, 'dist')));
+
+
+app.use(express.static("dist"));
+
+app.use('/images', express.static('images'));
 
 // Handle SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-
-
-app.use('/images', express.static('images'));
 
 app.listen(appPort, () => {
   console.log(`Server listening on port ${appPort}`);
