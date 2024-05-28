@@ -26,7 +26,7 @@ app.use('/api/v1/admin/requests', adminRequestRoutes);
 app.use('/api/v1/admin/users',adminUserRoutes);
 
 app.use('/api/v1/rooms',userRoutes);
-app.use("/api/v1/login",authRoutes)
+app.use("/api/v1/login",authRoutes);
 
 
 
