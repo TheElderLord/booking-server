@@ -10,8 +10,10 @@ const adminUserRoutes = require('./routes/admin/userRoutes');
 
 const userRoutes = require("./routes/user/userRoomRoutes");
 
+const history = require('connect-history-api-fallback');
 
 const app = express();
+app.use(history());
 
 // Invoke cors to get the middleware handler
 app.use(cors());
